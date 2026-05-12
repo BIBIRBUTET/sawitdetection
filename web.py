@@ -188,26 +188,26 @@ with st.sidebar:
 # =========================================================
 
 if menu == "🏠 Beranda":
-    st.markdown("## 👋 Selamat Datang di SawitGuard AI")
-    st.write("Aplikasi ini menggunakan kecerdasan buatan (AI) untuk mendeteksi berbagai jenis penyakit pada daun kelapa sawit secara otomatis. Dengan deteksi dini, Anda dapat mengambil langkah pencegahan yang tepat untuk menjaga produktivitas panen.")
+    st.markdown("## 👋 Selamat Datang di Sawit Detection")
+    st.write("Aplikasi ini menggunakan kecerdasan buatan (AI) untuk mendeteksi jenis penyakit pada daun kelapa sawit secara otomatis. Dengan deteksi dini, Anda dapat mengambil langkah pencegahan yang tepat untuk menjaga produktivitas panen.")
     
     st.info("👈 **Cara Penggunaan:** Buka menu navigasi di sebelah kiri (klik ikon **☰** di pojok kiri atas jika menggunakan HP), lalu pilih mode **Scan Gambar** atau **Live Detection** untuk mulai mendeteksi.")
     
     st.markdown("---")
-    st.markdown("### 🔍 Kenali Penyakit Daun Sawit")
+    st.markdown("### 🔍 Kenali Penyakit beberapa Daun Sawit")
     
     col_a, col_b = st.columns(2)
     with col_a:
         with st.container(border=True):
-            st.markdown("#### 🟠 Bercak Coklat")
-            st.write("Menyebabkan bercak berwarna kecoklatan pada daun. Memerlukan penyesuaian nutrisi dan pemberian **pupuk** untuk memulihkan kondisi tanaman.")
+            st.markdown("#### 🟠 Bercak Culvularia")
+            st.write("Penyakit Curvularia adalah penyakit jamur yang menyerang daun sawit dan menyebabkan bercak coklat atau hitam. Penyakit ini lebih mudah muncul di kondisi lembap dan kebun yang kurang terawat. Jika ditangani sejak awal, penyebarannya bisa dikendalikan sehingga tanaman sawit tetap sehat dan produkti.")
         with st.container(border=True):
-            st.markdown("#### ⚪ Bercak Putih")
-            st.write("Ditandai dengan lesi berwarna pucat atau putih. Infeksi ini membutuhkan penanganan cepat menggunakan **pestisida** untuk menghentikan penyebaran jamur.")
+            st.markdown("#### ⚪ Bercak Pestalotiopsis")
+            st.write("Pestalotiopsis adalah penyakit jamur yang menyerang daun tanaman kelapa sawit. Penyakit ini cukup sering ditemukan di perkebunan sawit, terutama pada tanaman yang sedang lemah atau berada di lingkungan yang terlalu lembap. Ditandai dengan lesi berwarna pucat atau putih. Infeksi ini membutuhkan penanganan cepat menggunakan **pestisida** untuk menghentikan penyebaran jamur.")
     with col_b:
         with st.container(border=True):
             st.markdown("#### 🔴 Bercak Heminthosprium")
-            st.write("Penyakit jamur yang mengganggu fotosintesis daun. Umumnya diatasi dengan sanitasi ketat pada area kebun dan fungisida khusus.")
+            st.write("Penyakit Helminthosporium adalah salah satu penyakit jamur yang menyerang daun tanaman kelapa sawit. Penyakit ini biasanya menyebabkan munculnya bercak-bercak pada daun sehingga daun terlihat rusak, mengering, dan pertumbuhan tanaman bisa terganggu.")
         with st.container(border=True):
             st.markdown("#### 🟢 Daun Sehat")
             st.write("Kondisi daun normal tanpa indikasi infeksi jamur atau hama. Pertahankan jadwal perawatan rutin kebun Anda.")
