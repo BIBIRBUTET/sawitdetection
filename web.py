@@ -283,7 +283,7 @@ elif menu == "📹 Deteksi Langsung":
             return av.VideoFrame.from_ndarray(annotated, format="bgr24")
             
     webrtc_streamer(
-        key="sawitguard-ai",
+        key="sawitGuard-ai",
         mode=WebRtcMode.SENDRECV,
         rtc_configuration=RTCConfiguration({
             "iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]
