@@ -8,3 +8,4 @@ numpy
 tornado<6.2
 streamlit-webrtc
 streamlit
+twilio
