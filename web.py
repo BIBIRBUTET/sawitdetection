@@ -5,6 +5,8 @@ import numpy as np
 from streamlit_webrtc import webrtc_streamer, WebRtcMode, RTCConfiguration
 import av
 import time
+import os
+from twilio.rest import Client
 
 # =========================================================
 # PAGE CONFIG
@@ -163,7 +165,6 @@ def get_advice(label):
 with st.sidebar:
     st.markdown("## 🧭 **Menu**")
     
-    # Menambahkan opsi "Beranda" di urutan pertama
     menu = st.radio(
         "Pilih Halaman:",
         ["🏠 Beranda", "📸 Scan Gambar", "📹 Deteksi Langsung", "📈 Data"],
@@ -201,7 +202,7 @@ if menu == "🏠 Beranda":
     with col_a:
         with st.container(border=True):
             st.markdown("#### 🟠 Bercak Culvularia")
-            st.write("Penyakit Curvularia adalah penyakit jamur yang menyerang daun sawit dan menyebabkan bercak coklat atau hitam. Penyakit ini lebih mudah muncul di kondisi lembap dan kebun yang kurang terawat. Jika ditangani sejak awal, penyebarannya bisa dikendalikan sehingga tanaman sawit tetap sehat dan produkti.")
+            st.write("Penyakit Curvularia adalah penyakit jamur yang menyerang daun sawit dan menyebabkan bercak coklat atau hitam. Penyakit ini lebih mudah muncul di kondisi lembap dan kebun yang kurang terawat. Jika ditangani sejak awal, penyebarannya bisa dikendalikan sehingga tanaman sawit tetap sehat dan produktif.")
         with st.container(border=True):
             st.markdown("#### ⚪ Bercak Pestalotiopsis")
             st.write("Pestalotiopsis adalah penyakit jamur yang menyerang daun tanaman kelapa sawit. Penyakit ini cukup sering ditemukan di perkebunan sawit, terutama pada tanaman yang sedang lemah atau berada di lingkungan yang terlalu lembap. Ditandai dengan lesi berwarna pucat atau putih. Infeksi ini membutuhkan penanganan cepat menggunakan **pestisida** untuk menghentikan penyebaran jamur.")
@@ -276,6 +277,19 @@ elif menu == "📹 Deteksi Langsung":
     st.markdown("## 📹 Deteksi Langsung")
     st.info("Gunakan browser Chrome dan izinkan akses kamera.")
     
+    # --- FUNGSI MENGAMBIL TURN SERVER DARI TWILIO ---
+    @st.cache_data
+    def get_ice_servers():
+        try:
+            account_sid = st.secrets["TWILIO_ACCOUNT_SID"]
+            auth_token = st.secrets["TWILIO_AUTH_TOKEN"]
+            client = Client(account_sid, auth_token)
+            token = client.tokens.create()
+            return token.ice_servers
+        except Exception as e:
+            st.warning("⚠️ Twilio tidak terkonfigurasi. Menggunakan server publik sebagai cadangan.")
+            return [{"urls": ["stun:stun.l.google.com:19302"]}]
+    
     class VideoProcessor:
         def recv(self, frame):
             img = frame.to_ndarray(format="bgr24")
@@ -286,9 +300,9 @@ elif menu == "📹 Deteksi Langsung":
     webrtc_streamer(
         key="sawitGuard-ai",
         mode=WebRtcMode.SENDRECV,
-        rtc_configuration=RTCConfiguration({
-            "iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]
-        }),
+        rtc_configuration=RTCConfiguration(
+            {"iceServers": get_ice_servers()}
+        ),
         video_processor_factory=VideoProcessor,
         media_stream_constraints={"video": True, "audio": False},
         async_processing=True)
