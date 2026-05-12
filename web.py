@@ -160,7 +160,7 @@ def get_advice(label):
 # SIDEBAR & NAVIGASI
 # =========================================================
 with st.sidebar:
-    st.markdown("## 🧭 Menu Navigasi")
+    st.markdown("## 🧭 **Menu**")
     
     # Menambahkan opsi "Beranda" di urutan pertama
     menu = st.radio(
@@ -173,7 +173,7 @@ with st.sidebar:
     if menu in ["📸 Scan Gambar", "📹 Live Detection"]:
         st.markdown("## ⚙️ Pengaturan AI")
         confidence = st.slider(
-            "Confidence Threshold",
+            "Kekuatan Deteksi",
             min_value=0.1,
             max_value=1.0,
             value=0.4,
