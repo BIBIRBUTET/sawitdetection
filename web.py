@@ -10,7 +10,7 @@ import time
 # PAGE CONFIG
 # =========================================================
 st.set_page_config(
-    page_title="SawitGuard AI",
+    page_title="SawitDetection",
     page_icon="🌿",
     layout="wide",
     initial_sidebar_state="expanded")
@@ -165,7 +165,7 @@ with st.sidebar:
     # Menambahkan opsi "Beranda" di urutan pertama
     menu = st.radio(
         "Pilih Halaman:",
-        ["🏠 Beranda", "📸 Scan Gambar", "📹 Live Detection", "📈 Statistik"],
+        ["🏠 Beranda", "📸 Scan Gambar", "📹 Live Detection", "📈 Data"],
         label_visibility="collapsed"
     )
     
@@ -189,7 +189,7 @@ with st.sidebar:
 
 if menu == "🏠 Beranda":
     st.markdown("## 👋 Selamat Datang di Sawit Detection")
-    st.write("Aplikasi ini menggunakan kecerdasan buatan (AI) untuk mendeteksi jenis penyakit pada daun kelapa sawit secara otomatis. Dengan deteksi dini, Anda dapat mengambil langkah pencegahan yang tepat untuk menjaga produktivitas panen.")
+    st.write("Web ini menggunakan kecerdasan buatan (AI) untuk mendeteksi jenis penyakit pada daun kelapa sawit secara otomatis. Dengan deteksi dini, Anda dapat mengambil langkah pencegahan yang tepat untuk menjaga produktivitas panen.")
     
     st.info("👈 **Cara Penggunaan:** Buka menu navigasi di sebelah kiri (klik ikon **☰** di pojok kiri atas jika menggunakan HP), lalu pilih mode **Scan Gambar** atau **Live Detection** untuk mulai mendeteksi.")
     
