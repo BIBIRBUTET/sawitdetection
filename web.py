@@ -191,10 +191,10 @@ if menu == "🏠 Beranda":
     st.markdown("## 👋 Selamat Datang di Sawit Detection")
     st.write("Web ini menggunakan kecerdasan buatan (AI) untuk mendeteksi jenis penyakit pada daun kelapa sawit secara otomatis. Dengan deteksi dini, Anda dapat mengambil langkah pencegahan yang tepat untuk menjaga produktivitas panen.")
     
-    st.info("👈 **Cara Penggunaan:** Buka menu navigasi di sebelah kiri (klik ikon **☰** di pojok kiri atas jika menggunakan HP), lalu pilih mode **Scan Gambar** atau **Live Detection** untuk mulai mendeteksi.")
+    st.info("👈 **Cara Penggunaan:** Buka menu navigasi di sebelah kiri (klik ikon **☰** di pojok kiri atas jika menggunakan HP), lalu pilih mode **Scan Gambar** untuk mengambil gambar langsung ataupun pilih dari galeri atau **Deteksi Langsung** untuk mulai mendeteksi secara langsung Deteksi langsung ini akan memunculkan keterangan pada kamera langsung.")
     
     st.markdown("---")
-    st.markdown("### 🔍 Kenali Penyakit beberapa Daun Sawit")
+    st.markdown("### 🔍 Kenali Beberapa Penyakit Daun Sawit")
     
     col_a, col_b = st.columns(2)
     with col_a:
@@ -283,7 +283,7 @@ elif menu == "📹 Deteksi Langsung":
             return av.VideoFrame.from_ndarray(annotated, format="bgr24")
             
     webrtc_streamer(
-        key="sawitguard-ai",
+        key="sawitdeteksi",
         mode=WebRtcMode.SENDRECV,
         rtc_configuration=RTCConfiguration({
             "iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]
