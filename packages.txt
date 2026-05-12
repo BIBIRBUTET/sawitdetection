@@ -1,4 +1,1 @@
 ffmpeg
-tornado<6.2
-streamlit-webrtc
-streamlit
