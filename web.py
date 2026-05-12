@@ -271,8 +271,8 @@ elif menu == "📸 Scan Gambar":
             else:
                 st.success("✅ Tidak ditemukan penyakit. Daun sehat.")
 
-elif menu == "📹 Live Detection":
-    st.markdown("## 📹 Live Camera Detection")
+elif menu == "📹 Deteksi Langsung":
+    st.markdown("## 📹 Deteksi Langsung")
     st.info("Gunakan browser Chrome dan izinkan akses kamera.")
     
     class VideoProcessor:
@@ -292,7 +292,7 @@ elif menu == "📹 Live Detection":
         media_stream_constraints={"video": True, "audio": False},
         async_processing=True)
 
-elif menu == "📈 Statistik":
+elif menu == "📈 Data":
     st.markdown("## 📈 Statistik Model")
     c1, c2, c3, c4 = st.columns(4)
     with c1:
@@ -309,6 +309,6 @@ elif menu == "📈 Statistik":
 # =========================================================
 st.markdown("""
 <div class='footer'>
-© 2026 Sawit Detection • RT-DETR Detection System
+© 2026 Sawit Detection • RT-DETR Detection System By Ishbir
 </div>
 """, unsafe_allow_html=True)
