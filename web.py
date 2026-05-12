@@ -13,7 +13,8 @@ st.set_page_config(
     page_title="SawitDetection",
     page_icon="🌿",
     layout="wide",
-    initial_sidebar_state="expanded")
+    initial_sidebar_state="expanded"
+)
 
 # =========================================================
 # CUSTOM CSS (Dengan Perbaikan Responsif untuk HP)
@@ -125,7 +126,7 @@ except Exception as e:
     st.stop()
 
 # =========================================================
-# REKOMENDASI (Disesuaikan dengan Aturan Anda)
+# REKOMENDASI 
 # =========================================================
 def get_advice(label):
     label = label.lower()
@@ -165,12 +166,12 @@ with st.sidebar:
     # Menambahkan opsi "Beranda" di urutan pertama
     menu = st.radio(
         "Pilih Halaman:",
-        ["🏠 Beranda", "📸 Scan Gambar", "📹 Live Detection", "📈 Data"],
+        ["🏠 Beranda", "📸 Scan Gambar", "📹 Deteksi Langsung", "📈 Data"],
         label_visibility="collapsed"
     )
     
     st.markdown("---")
-    if menu in ["📸 Scan Gambar", "📹 Live Detection"]:
+    if menu in ["📸 Scan Gambar", "📹 Deteksi Langsung"]:
         st.markdown("## ⚙️ Pengaturan AI")
         confidence = st.slider(
             "Kekuatan Deteksi",
