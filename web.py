@@ -19,7 +19,7 @@ st.set_page_config(
 )
 
 # =========================================================
-# CUSTOM CSS (Dengan Perbaikan Responsif untuk HP)
+# CUSTOM CSS
 # =========================================================
 st.markdown("""
 <style>
@@ -29,14 +29,14 @@ html, body, [class*="css"] {
     font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
-/* BACKGROUND HIJAU TUA MODERN */
+/* BACKGROUND */
 .stApp {
     background-color: #0b1c13;
     background-image: radial-gradient(circle at 50% 0%, #153b23 0%, #0b1c13 60%);
     color: #e0e0e0;
 }
 
-/* HEADER UTAMA */
+/* HEADER */
 .main-header {
     background: linear-gradient(135deg, #16562b, #24813f);
     padding: 40px;
@@ -46,29 +46,29 @@ html, body, [class*="css"] {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
     border: 1px solid rgba(255, 255, 255, 0.05);
 }
+
 .main-header h1 {
-    color: #ffffff;
+    color: white;
     font-size: 3rem;
     font-weight: 800;
     margin-bottom: 8px;
-    line-height: 1.2;
 }
+
 .main-header p {
     color: #c8e6c9;
     font-size: 1.1rem;
-    margin-bottom: 0;
 }
 
-/* RESPONSIVE UNTUK HANDPHONE (< 768px) */
 @media (max-width: 768px) {
     .main-header {
         padding: 25px 15px;
         border-radius: 18px;
-        margin-bottom: 20px;
     }
+
     .main-header h1 {
-        font-size: 2rem; /* Ukuran font dikecilkan untuk HP */
+        font-size: 2rem;
     }
+
     .main-header p {
         font-size: 0.95rem;
     }
@@ -79,12 +79,12 @@ section[data-testid="stSidebar"] {
     background: rgba(8, 20, 12, 0.98);
 }
 
-/* METRIC CARDS */
+/* METRIC */
 [data-testid="metric-container"] {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255,255,255,0.05);
     border-radius: 16px;
     padding: 15px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255,255,255,0.08);
 }
 
 /* FOOTER */
@@ -95,12 +95,6 @@ section[data-testid="stSidebar"] {
     opacity: 0.7;
     padding-bottom: 20px;
     font-size: 0.9rem;
-}
-
-/* RADIO BUTTON STYLING */
-div.row-widget.stRadio > div {
-    flex-direction: column;
-    gap: 12px;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -116,11 +110,22 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # =========================================================
+# MODEL PATH
+# =========================================================
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_PATH = os.path.join(BASE_DIR, "best.pt")
+
+if not os.path.exists(MODEL_PATH):
+    st.error("❌ File model best.pt tidak ditemukan!")
+    st.stop()
+
+# =========================================================
 # LOAD MODEL
 # =========================================================
 @st.cache_resource
 def load_model():
-    return RTDETR("best.pt")
+    return RTDETR(MODEL_PATH)
+
 try:
     model = load_model()
 except Exception as e:
@@ -128,196 +133,371 @@ except Exception as e:
     st.stop()
 
 # =========================================================
-# REKOMENDASI 
+# REKOMENDASI
 # =========================================================
 def get_advice(label):
+
     label = label.lower()
-    
-    # Deteksi berdasarkan jenis bercak
-    if "culvularia" in label or "brown spot" in label:
+
+    if "culvularia" in label:
         return {
             "emoji": "🟠",
-            "title": "Bercak Coklat (Culvularia)",
-            "desc": "Penyakit terdeteksi. Segera aplikasikan rekomendasi pupuk yang sesuai untuk memperkuat ketahanan tanaman.",
-            "status": "Butuh Pupuk"}
-    elif "pestalotiopsis" in label or "white spot" in label:
+            "title": "Bercak Culvularia",
+            "desc": "Penyakit terdeteksi. Gunakan fungisida dan tingkatkan sanitasi kebun.",
+            "status": "Butuh Penanganan"
+        }
+
+    elif "pestalotiopsis" in label:
         return {
             "emoji": "⚪",
-            "title": "Bercak Putih (Pestalotiopsis)",
-            "desc": "Penyakit terdeteksi. Segera aplikasikan pestisida yang direkomendasikan untuk mengendalikan penyebaran.",
-            "status": "Butuh Pestisida"}
-    elif "heminthosprium" in label:
+            "title": "Bercak Pestalotiopsis",
+            "desc": "Gunakan pestisida yang direkomendasikan untuk menghentikan penyebaran jamur.",
+            "status": "Butuh Pestisida"
+        }
+
+    elif "helminthosprium" in label:
         return {
             "emoji": "🔴",
-            "title": "Bercak Heminthosprium",
+            "title": "Bercak Helminthosprium",
             "desc": "Lakukan sanitasi daun dan gunakan fungisida berbahan tembaga.",
-            "status": "Penyakit Terdeteksi"}
-    
+            "status": "Penyakit Terdeteksi"
+        }
+
     return {
         "emoji": "🟢",
         "title": "Daun Sehat",
         "desc": "Tanaman dalam kondisi sehat dan normal.",
-        "status": "Sehat"}
+        "status": "Sehat"
+    }
 
 # =========================================================
-# SIDEBAR & NAVIGASI
+# SIDEBAR
 # =========================================================
 with st.sidebar:
-    st.markdown("## 🧭 **Menu**")
-    
+
+    st.markdown("## 🧭 Menu")
+
     menu = st.radio(
-        "Pilih Halaman:",
-        ["🏠 Beranda", "📸 Scan Gambar", "📹 Deteksi Langsung", "📈 Data"],
+        "Pilih Halaman",
+        [
+            "🏠 Beranda",
+            "📸 Scan Gambar",
+            "📹 Deteksi Langsung",
+            "📈 Data"
+        ],
         label_visibility="collapsed"
     )
-    
+
     st.markdown("---")
+
     if menu in ["📸 Scan Gambar", "📹 Deteksi Langsung"]:
+
         st.markdown("## ⚙️ Pengaturan AI")
+
         confidence = st.slider(
-            "Kekuatan Deteksi",
+            "Confidence",
             min_value=0.1,
             max_value=1.0,
-            value=0.4,
-            step=0.05)
-        st.markdown("---")
-        
-    st.markdown("## 📊 Info Model")
-    st.success("✅ Model Aktif")
+            value=0.5,
+            step=0.05
+        )
 
-# =========================================================
-# KONTEN UTAMA
-# =========================================================
-
-if menu == "🏠 Beranda":
-    st.markdown("## 👋 Selamat Datang di Sawit Detection")
-    st.write("Web ini menggunakan kecerdasan buatan (AI) untuk mendeteksi jenis penyakit pada daun kelapa sawit secara otomatis. Dengan deteksi dini, Anda dapat mengambil langkah pencegahan yang tepat untuk menjaga produktivitas panen.")
-    
-    st.info("👈 **Cara Penggunaan:** Buka menu navigasi di sebelah kiri (klik ikon **☰** di pojok kiri atas jika menggunakan HP), lalu pilih mode **Scan Gambar** untuk mengambil gambar langsung ataupun pilih dari galeri atau **Deteksi Langsung** untuk mulai mendeteksi secara langsung Deteksi langsung ini akan memunculkan keterangan pada kamera langsung.")
-    
     st.markdown("---")
-    st.markdown("### 🔍 Kenali Beberapa Penyakit Daun Sawit")
-    
-    col_a, col_b = st.columns(2)
-    with col_a:
-        with st.container(border=True):
-            st.markdown("#### 🟠 Bercak Culvularia")
-            st.write("Penyakit Curvularia adalah penyakit jamur yang menyerang daun sawit dan menyebabkan bercak coklat atau hitam. Penyakit ini lebih mudah muncul di kondisi lembap dan kebun yang kurang terawat. Jika ditangani sejak awal, penyebarannya bisa dikendalikan sehingga tanaman sawit tetap sehat dan produktif.")
-        with st.container(border=True):
-            st.markdown("#### ⚪ Bercak Pestalotiopsis")
-            st.write("Pestalotiopsis adalah penyakit jamur yang menyerang daun tanaman kelapa sawit. Penyakit ini cukup sering ditemukan di perkebunan sawit, terutama pada tanaman yang sedang lemah atau berada di lingkungan yang terlalu lembap. Ditandai dengan lesi berwarna pucat atau putih. Infeksi ini membutuhkan penanganan cepat menggunakan **pestisida** untuk menghentikan penyebaran jamur.")
-    with col_b:
-        with st.container(border=True):
-            st.markdown("#### 🔴 Bercak Heminthosprium")
-            st.write("Penyakit Helminthosporium adalah salah satu penyakit jamur yang menyerang daun tanaman kelapa sawit. Penyakit ini biasanya menyebabkan munculnya bercak-bercak pada daun sehingga daun terlihat rusak, mengering, dan pertumbuhan tanaman bisa terganggu.")
-        with st.container(border=True):
-            st.markdown("#### 🟢 Daun Sehat")
-            st.write("Kondisi daun normal tanpa indikasi infeksi jamur atau hama. Pertahankan jadwal perawatan rutin kebun Anda.")
 
-elif menu == "📸 Scan Gambar":
-    st.markdown("## 📸 Upload atau Ambil Foto")
+    st.markdown("## 📊 Info Model")
+    st.success("✅ RT-DETR Aktif")
+
+# =========================================================
+# BERANDA
+# =========================================================
+if menu == "🏠 Beranda":
+
+    st.markdown("## 👋 Selamat Datang di Sawit Detection")
+
+    st.write("""
+    Sistem ini menggunakan kecerdasan buatan berbasis RT-DETR 
+    untuk mendeteksi penyakit daun kelapa sawit secara otomatis.
+    """)
+
+    st.info("""
+    👈 Gunakan menu di sebelah kiri untuk:
+    
+    • Upload gambar daun  
+    • Mengambil foto langsung  
+    • Deteksi realtime menggunakan kamera  
+    • Melihat statistik model AI
+    """)
+
+    st.markdown("---")
+
     col1, col2 = st.columns(2)
+
     with col1:
+
+        with st.container(border=True):
+            st.markdown("### 🟠 Culvularia")
+            st.write("""
+            Penyakit jamur yang menyebabkan bercak coklat pada daun sawit.
+            """)
+
+        with st.container(border=True):
+            st.markdown("### ⚪ Pestalotiopsis")
+            st.write("""
+            Penyakit jamur yang menyebabkan bercak putih pucat pada daun.
+            """)
+
+    with col2:
+
+        with st.container(border=True):
+            st.markdown("### 🔴 Helminthosprium")
+            st.write("""
+            Penyakit jamur yang menyebabkan bercak gelap pada daun sawit.
+            """)
+
+        with st.container(border=True):
+            st.markdown("### 🟢 Daun Sehat")
+            st.write("""
+            Tidak ditemukan indikasi penyakit pada daun.
+            """)
+
+# =========================================================
+# SCAN GAMBAR
+# =========================================================
+elif menu == "📸 Scan Gambar":
+
+    st.markdown("## 📸 Upload atau Ambil Foto")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+
         uploaded_file = st.file_uploader(
             "Upload Gambar",
-            type=["jpg", "jpeg", "png"])
-        camera_image = st.camera_input(
-            "Ambil Foto Daun")
-    
+            type=["jpg", "jpeg", "png"]
+        )
+
+        camera_image = st.camera_input("Ambil Foto")
+
     image_source = None
+
     if uploaded_file:
         image_source = uploaded_file
+
     elif camera_image:
         image_source = camera_image
-        
+
     if image_source:
+
         img = Image.open(image_source).convert("RGB")
+
         with st.spinner("🔍 AI sedang menganalisis gambar..."):
+
             start_time = time.time()
+
             results = model.predict(
                 np.array(img),
-                conf=confidence)
+                conf=confidence,
+                imgsz=640,
+                verbose=False
+            )
+
             end_time = time.time()
-            
+
         if results and len(results) > 0:
+
             result_img = results[0].plot()[:, :, ::-1]
+
             with col2:
                 st.image(
                     result_img,
-                    caption="Hasil Deteksi AI",
-                    use_container_width=True)
-            
-            st.markdown("## 📋 Hasil Analisis & Rekomendasi")
+                    caption="Hasil Deteksi",
+                    use_container_width=True
+                )
+
+            st.markdown("## 📋 Hasil Analisis")
+
             boxes = results[0].boxes
+
             if boxes is not None and len(boxes) > 0:
-                detected_count = len(boxes)
+
+                detected_labels = set()
+
+                detected_count = 0
+
                 for box in boxes:
+
                     cls_id = int(box.cls[0])
                     label = model.names[cls_id]
-                    conf_score = float(box.conf[0]) * 100
-                    advice = get_advice(label)
-                    
-                    with st.container(border=True):
-                        st.subheader(f"{advice['emoji']} {advice['title']}")
-                        st.write(advice['desc'])
-                        st.progress(min(conf_score / 100, 1.0))
-                        st.caption(f"Confidence: {conf_score:.2f}% | Tindakan: {advice['status']}")
-                        
-                m1, m2, m3 = st.columns(3)
-                with m1:
-                    st.metric("Objek Terdeteksi", detected_count)
-                with m2:
-                    st.metric("Inference Time", f"{(end_time-start_time):.2f}s")
-                with m3:
-                    st.metric("Status", "Terdeteksi")
-            else:
-                st.success("✅ Tidak ditemukan penyakit. Daun sehat.")
 
+                    conf_score = float(box.conf[0]) * 100
+
+                    if conf_score < 50:
+                        continue
+
+                    if label in detected_labels:
+                        continue
+
+                    detected_labels.add(label)
+
+                    detected_count += 1
+
+                    advice = get_advice(label)
+
+                    with st.container(border=True):
+
+                        st.subheader(
+                            f"{advice['emoji']} {advice['title']}"
+                        )
+
+                        st.write(advice['desc'])
+
+                        st.progress(min(conf_score / 100, 1.0))
+
+                        st.caption(
+                            f"Confidence: {conf_score:.2f}%"
+                        )
+
+                c1, c2, c3 = st.columns(3)
+
+                with c1:
+                    st.metric("Objek", detected_count)
+
+                with c2:
+                    st.metric(
+                        "Inference",
+                        f"{(end_time-start_time):.2f}s"
+                    )
+
+                with c3:
+                    st.metric("Status", "Terdeteksi")
+
+            else:
+                st.success("✅ Tidak ditemukan penyakit.")
+
+# =========================================================
+# DETEKSI REALTIME
+# =========================================================
 elif menu == "📹 Deteksi Langsung":
+
     st.markdown("## 📹 Deteksi Langsung")
-    st.info("Gunakan browser Chrome dan izinkan akses kamera.")
-    
-    # --- FUNGSI MENGAMBIL TURN SERVER DARI TWILIO ---
+
+    st.info("""
+    Gunakan browser Chrome dan izinkan akses kamera.
+    """)
+
     @st.cache_data
     def get_ice_servers():
+
         try:
+
             account_sid = st.secrets["TWILIO_ACCOUNT_SID"]
             auth_token = st.secrets["TWILIO_AUTH_TOKEN"]
+
             client = Client(account_sid, auth_token)
+
             token = client.tokens.create()
+
             return token.ice_servers
-        except Exception as e:
-            st.warning("⚠️ Twilio tidak terkonfigurasi. Menggunakan server publik sebagai cadangan.")
-            return [{"urls": ["stun:stun.l.google.com:19302"]}]
-    
+
+        except:
+            return [{
+                "urls": ["stun:stun.l.google.com:19302"]
+            }]
+
     class VideoProcessor:
+
         def recv(self, frame):
+
             img = frame.to_ndarray(format="bgr24")
-            results = model.predict(img, conf=confidence)
+
+            results = model.predict(
+                img,
+                conf=confidence,
+                imgsz=640,
+                verbose=False
+            )
+
             annotated = results[0].plot()
-            return av.VideoFrame.from_ndarray(annotated, format="bgr24")
-            
+
+            return av.VideoFrame.from_ndarray(
+                annotated,
+                format="bgr24"
+            )
+
     webrtc_streamer(
-        key="sawitGuard-ai",
+        key="sawit-ai",
         mode=WebRtcMode.SENDRECV,
         rtc_configuration=RTCConfiguration(
             {"iceServers": get_ice_servers()}
         ),
         video_processor_factory=VideoProcessor,
-        media_stream_constraints={"video": True, "audio": False},
-        async_processing=True)
+        media_stream_constraints={
+            "video": True,
+            "audio": False
+        },
+        async_processing=True
+    )
 
+# =========================================================
+# DATA MODEL
+# =========================================================
 elif menu == "📈 Data":
-    st.markdown("## 📈 Statistik Model")
+
+    st.markdown("## 📈 Statistik Model RT-DETR")
+
     c1, c2, c3, c4 = st.columns(4)
+
     with c1:
-        st.metric("Epoch", "150")
+        st.metric("Epoch", "100")
+
     with c2:
-        st.metric("mAP50", "46.5%")
+        st.metric("mAP50", "55.2%")
+
     with c3:
-        st.metric("Precision", "65.3%")
+        st.metric("Precision", "65.1%")
+
     with c4:
-        st.metric("Recall", "46.8%")
+        st.metric("Recall", "52.1%")
+
+    st.markdown("---")
+
+    st.markdown("### 📊 Performa Tiap Penyakit")
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        with st.container(border=True):
+
+            st.markdown("#### 🟠 Culvularia")
+
+            st.write("Precision : 65.4%")
+            st.write("Recall : 46.3%")
+            st.write("mAP50 : 47.5%")
+
+    with col2:
+        with st.container(border=True):
+
+            st.markdown("#### 🔴 Helminthosprium")
+
+            st.write("Precision : 77.5%")
+            st.write("Recall : 75.0%")
+            st.write("mAP50 : 82.8%")
+
+    with col3:
+        with st.container(border=True):
+
+            st.markdown("#### ⚪ Pestalotiopsis")
+
+            st.write("Precision : 52.4%")
+            st.write("Recall : 35.0%")
+            st.write("mAP50 : 35.4%")
+
+    st.markdown("---")
+
+    st.info("""
+    📌 Model dilatih menggunakan RT-DETR selama 100 epoch 
+    menggunakan dataset penyakit daun kelapa sawit.
+    """)
 
 # =========================================================
 # FOOTER
