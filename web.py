@@ -158,7 +158,7 @@ st.markdown("""
 # =========================================================
 @st.cache_resource
 def load_model():
-    return RTDETR("oke.pt")
+    return RTDETR("best.pt")
 try:
     model = load_model()
 except Exception as e:
