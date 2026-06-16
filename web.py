@@ -282,20 +282,20 @@ def get_advice(label):
     if "culvularia" in label or "brown spot" in label:
         return {
             "emoji": "🟠",
-            "title": "Bercak Coklat (Culvularia)",
-            "desc": "Penyakit terdeteksi. Segera aplikasikan rekomendasi pupuk yang sesuai untuk memperkuat ketahanan tanaman.",
+            "title": "Culvularia",
+            "desc": "Penyakit terdeteksi. Segera Berikan pupuk yang sesuai untuk menjaga kesehatan tanaman.",
             "status": "Butuh Pupuk"}
     elif "pestalotiopsis" in label or "white spot" in label:
         return {
             "emoji": "⚪",
-            "title": "Bercak Putih (Pestalotiopsis)",
-            "desc": "Penyakit terdeteksi. Segera aplikasikan pestisida yang direkomendasikan untuk mengendalikan penyebaran.",
+            "title": "Pestalotiopsis",
+            "desc": "Penyakit terdeteksi. Segera berikan pestisida untuk mengendalikan penyebaran.",
             "status": "Butuh Pesticida"}
     elif "heminthosprium" in label:
         return {
             "emoji": "🔴",
             "title": "Bercak Heminthosprium",
-            "desc": "Lakukan sanitasi daun dan gunakan fungisida berbahan tembaga.",
+            "desc": "Lakukan sanitasi daun dan rutin lakukan penyiraman serta perawatan.",
             "status": "Penyakit Terdeteksi"}
     
     return {
@@ -346,7 +346,7 @@ elif menu == "📸 Scan Gambar":
         
     if image_source:
         img = Image.open(image_source).convert("RGB")
-        with st.spinner("⚡ AI Premium sedang memindai matriks daun secara real-time..."):
+        with st.spinner("⚡ Model AI sedang memindai daun "):
             start_time = time.time()
             results = model.predict(
                 np.array(img),
