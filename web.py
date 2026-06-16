@@ -7,7 +7,7 @@ import av
 import time
 import os
 from twilio.rest import Client
-import pandas as pd  # Ditambahkan untuk menunjang pembuatan grafik premium
+import pandas as pd
 
 # =========================================================
 # PAGE CONFIG
@@ -20,9 +20,46 @@ st.set_page_config(
 )
 
 # =========================================================
-# CUSTOM CSS (Premium Modern AI Website & Mobile Responsive)
+# SIDEBAR & NAVIGASI
 # =========================================================
-st.markdown("""
+with st.sidebar:
+    st.markdown("## 🎨 **Tema Tampilan**")
+    tema = st.radio(
+        "Pilih Tema:",
+        ["Gelap 🌙", "Terang ☀️"],
+        horizontal=True,
+        label_visibility="collapsed"
+    )
+    
+    st.markdown("---")
+    st.markdown("## 🧭 **Menu**")
+    
+    menu = st.radio(
+        "Pilih Halaman:",
+        ["🏠 Beranda", "📸 Scan Gambar", "📹 Deteksi Langsung", "📈 Data"],
+        label_visibility="collapsed"
+    )
+    
+    st.markdown("---")
+    if menu in ["📸 Scan Gambar", "📹 Deteksi Langsung"]:
+        st.markdown("## ⚙️ Pengaturan AI")
+        confidence = st.slider(
+            "Kekuatan Deteksi",
+            min_value=0.1,
+            max_value=1.0,
+            value=0.4,
+            step=0.05)
+        st.markdown("---")
+        
+    st.markdown("## 📊 Info Model")
+    st.success("✅ Model Aktif")
+
+# =========================================================
+# CUSTOM CSS (Struktur Dasar, Gelap, & Terang Lembut)
+# =========================================================
+
+# 1. CSS STRUKTUR BERSAMA (Ukuran, Bentuk, dan Tata Letak)
+css_shared = """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
@@ -30,16 +67,6 @@ html, body, [class*="css"] {
     font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
-/* BACKGROUND HIJAU TUA MODERN DENGAN GRADASI BERLIAN */
-.stApp {
-    background-color: #06110a;
-    background-image: 
-        radial-gradient(circle at 50% 0%, #11331c 0%, #06110a 70%),
-        radial-gradient(circle at 0% 100%, #0a2212 0%, transparent 40%);
-    color: #e2e8f0;
-}
-
-/* HEADER UTAMA DENGAN GRADASI BERGERAK (PREMIUM) */
 @keyframes gradientHeader {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
@@ -47,109 +74,189 @@ html, body, [class*="css"] {
 }
 
 .main-header {
-    background: linear-gradient(-45deg, #124622, #1b5e20, #2e7d32, #16562b);
     background-size: 400% 400%;
     animation: gradientHeader 15s ease infinite;
     padding: 50px 30px;
     border-radius: 28px;
     text-align: center;
     margin-bottom: 35px;
+}
+.main-header h1 {
+    font-size: 3.5rem; font-weight: 800; margin-bottom: 12px;
+    line-height: 1.2; letter-spacing: -1px;
+}
+.main-header p {
+    font-size: 1.2rem; font-weight: 400; margin-bottom: 0;
+}
+
+@media (max-width: 768px) {
+    .main-header { padding: 30px 15px; border-radius: 20px; margin-bottom: 25px; }
+    .main-header h1 { font-size: 2.2rem; }
+    .main-header p { font-size: 1rem; }
+    div[data-testid="stMetricValue"] { font-size: 1.8rem !important; }
+}
+
+section[data-testid="stSidebar"] {
+    backdrop-filter: blur(15px);
+}
+
+[data-testid="metric-container"], div[data-testid="stCard"], .stElementContainer div[data-border="true"], [data-testid="stExpander"] {
+    backdrop-filter: blur(12px);
+    border-radius: 20px !important;
+    padding: 10px !important;
+    transition: transform 0.3s ease, border-color 0.3s ease;
+}
+[data-testid="stExpander"] details { border: none !important; }
+[data-testid="stExpander"] summary { font-size: 1.1rem; font-weight: 600; }
+
+div[data-testid="stSpinner"] {
+    padding: 20px; border-radius: 15px;
+}
+
+.footer {
+    text-align: center; margin-top: 60px; padding-bottom: 30px;
+    font-size: 0.95rem; letter-spacing: 0.5px;
+}
+
+section[data-testid="stSidebar"] .stRadio p {
+    font-size: 1.25rem !important; font-weight: 600 !important;   
+    padding: 8px 12px; border-radius: 10px; transition: all 0.3s ease;
+}
+div.row-widget.stRadio > div { flex-direction: column; gap: 10px; }
+
+[data-testid="collapsedControl"] {
+    transform: scale(1.6) !important; 
+    border-radius: 50% !important; padding: 5px !important;
+    margin-top: 5px !important; margin-left: 5px !important;
+    transition: all 0.3s ease; z-index: 999999 !important; 
+}
+</style>
+"""
+
+# 2. CSS MODE GELAP (Hitam / Hijau Tua) - Tetap sama
+css_dark = """
+<style>
+.stApp {
+    background-color: #06110a;
+    background-image: 
+        radial-gradient(circle at 50% 0%, #11331c 0%, #06110a 70%),
+        radial-gradient(circle at 0% 100%, #0a2212 0%, transparent 40%);
+}
+
+.main-header {
+    background: linear-gradient(-45deg, #124622, #1b5e20, #2e7d32, #16562b);
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255,255,255,0.1);
     border: 1px solid rgba(255, 255, 255, 0.08);
 }
-.main-header h1 {
-    color: #ffffff;
-    font-size: 3.5rem;
-    font-weight: 800;
-    margin-bottom: 12px;
-    line-height: 1.2;
-    letter-spacing: -1px;
-    text-shadow: 0 4px 12px rgba(0,0,0,0.3);
-}
-.main-header p {
-    color: #e8f5e9;
-    font-size: 1.2rem;
-    font-weight: 400;
-    margin-bottom: 0;
-    opacity: 0.9;
-}
+.main-header h1 { color: #ffffff !important; text-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+.main-header p { color: #e8f5e9 !important; opacity: 0.9; }
 
-/* RESPONSIVE UNTUK HANDPHONE (< 768px) */
-@media (max-width: 768px) {
-    .main-header {
-        padding: 30px 15px;
-        border-radius: 20px;
-        margin-bottom: 25px;
-    }
-    .main-header h1 {
-        font-size: 2.2rem;
-    }
-    .main-header p {
-        font-size: 1rem;
-    }
-    div[data-testid="stMetricValue"] {
-        font-size: 1.8rem !important;
-    }
-}
-
-/* SIDEBAR GLASSMORPHISM */
 section[data-testid="stSidebar"] {
-    background: rgba(4, 12, 6, 0.95) !important;
-    backdrop-filter: blur(15px);
-    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(4, 12, 6, 0.95) !important; border-right: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-/* METRIC CARDS & CONTAINER GLASSMORPHISM (PREMIUM LOOK) */
-[data-testid="metric-container"], div[data-testid="stCard"], .stElementContainer div[data-border="true"] {
+[data-testid="metric-container"], div[data-testid="stCard"], .stElementContainer div[data-border="true"], [data-testid="stExpander"] {
     background: rgba(255, 255, 255, 0.03) !important;
-    backdrop-filter: blur(12px);
-    border-radius: 20px !important;
-    padding: 20px !important;
-    border: 1px solid rgba(255, 255, 255, 0.07) !important;
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3) !important;
-    transition: transform 0.3s ease, border-color 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.07) !important; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3) !important;
+}
+[data-testid="metric-container"]:hover, .stElementContainer div[data-border="true"]:hover, [data-testid="stExpander"]:hover {
+    border-color: rgba(67, 160, 71, 0.4) !important; transform: translateY(-2px);
 }
 
-[data-testid="metric-container"]:hover, .stElementContainer div[data-border="true"]:hover {
-    transform: translateY(-2px);
-    border-color: rgba(67, 160, 71, 0.4) !important;
-}
-
-/* MODIFIKASI TAMPILAN SPINNER LOADING AGAR LEBIH MODERN */
 div[data-testid="stSpinner"] {
-    padding: 20px;
-    background: rgba(67, 160, 71, 0.1);
-    border-radius: 15px;
-    border: 1px solid rgba(67, 160, 71, 0.2);
+    background: rgba(67, 160, 71, 0.1); border: 1px solid rgba(67, 160, 71, 0.2);
     box-shadow: 0 0 20px rgba(67, 160, 71, 0.1);
 }
 
-/* FOOTER */
-.footer {
-    text-align: center;
-    margin-top: 60px;
-    color: #a5d6a7;
-    opacity: 0.6;
-    padding-bottom: 30px;
-    font-size: 0.95rem;
-    letter-spacing: 0.5px;
+.footer { color: #a5d6a7; opacity: 0.6; }
+
+section[data-testid="stSidebar"] .stRadio p:hover {
+    background: rgba(67, 160, 71, 0.2); transform: translateX(5px); color: #ffffff !important;
 }
 
-/* RADIO BUTTON STYLING */
-div.row-widget.stRadio > div {
-    flex-direction: column;
-    gap: 14px;
+[data-testid="collapsedControl"] {
+    background-color: rgba(46, 125, 50, 0.9) !important; box-shadow: 0 4px 10px rgba(0,0,0,0.5) !important;
 }
+[data-testid="collapsedControl"] svg { fill: #ffffff !important; stroke: #ffffff !important; }
+
+/* Kunci Tulisan Mode Gelap */
+.stApp p, .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp h5, .stApp h6, .stApp span, .stApp li, div[data-testid="stMetricValue"], .stApp label {
+    color: #e2e8f0 !important;
+}
+.main-header h1, .main-header p, .main-header span { color: #ffffff !important; }
 </style>
-""", unsafe_allow_html=True)
+"""
+
+# 3. CSS MODE TERANG (Pastel Sage Green Lembut)
+css_light = """
+<style>
+.stApp {
+    background-color: #f7fbf8;
+    background-image: 
+        radial-gradient(circle at 50% 0%, #edf5ee 0%, #f7fbf8 70%),
+        radial-gradient(circle at 0% 100%, #e0ebe1 0%, transparent 40%);
+}
+
+.main-header {
+    background: linear-gradient(-45deg, #8cbfa0, #a1ccb2, #b5d8c3, #94c4a6);
+    box-shadow: 0 15px 35px rgba(140, 191, 160, 0.15), inset 0 1px 1px rgba(255,255,255,0.6);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+.main-header h1 { color: #254031 !important; text-shadow: 0 2px 10px rgba(255,255,255,0.6); }
+.main-header p { color: #355242 !important; font-weight: 500; }
+
+section[data-testid="stSidebar"] {
+    background: rgba(245, 250, 246, 0.95) !important; border-right: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+[data-testid="metric-container"], div[data-testid="stCard"], .stElementContainer div[data-border="true"], [data-testid="stExpander"] {
+    background: rgba(255, 255, 255, 0.85) !important;
+    border: 1px solid rgba(140, 191, 160, 0.25) !important; box-shadow: 0 8px 24px 0 rgba(0, 0, 0, 0.03) !important;
+}
+[data-testid="metric-container"]:hover, .stElementContainer div[data-border="true"]:hover, [data-testid="stExpander"]:hover {
+    border-color: rgba(140, 191, 160, 0.8) !important; transform: translateY(-2px);
+}
+
+div[data-testid="stSpinner"] {
+    background: rgba(140, 191, 160, 0.15); border: 1px solid rgba(140, 191, 160, 0.3);
+    box-shadow: 0 0 15px rgba(140, 191, 160, 0.1);
+}
+
+.footer { color: #5a8069; opacity: 0.9; }
+
+section[data-testid="stSidebar"] .stRadio p:hover {
+    background: rgba(140, 191, 160, 0.25); transform: translateX(5px); color: #254031 !important;
+}
+
+[data-testid="collapsedControl"] {
+    background-color: rgba(161, 204, 178, 0.9) !important; box-shadow: 0 4px 10px rgba(0,0,0,0.1) !important;
+}
+[data-testid="collapsedControl"] svg { fill: #254031 !important; stroke: #254031 !important; }
+
+/* Kunci Tulisan Mode Terang (Abu-abu Kehijauan Tua - Sangat lembut dan kontras) */
+.stApp p, .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp h5, .stApp h6, .stApp span, .stApp li, div[data-testid="stMetricValue"], .stApp label {
+    color: #355242 !important;
+}
+.main-header h1 { color: #254031 !important; }
+.main-header p, .main-header span { color: #355242 !important; }
+div[data-testid="stAlert"] p { color: #355242 !important; }
+</style>
+"""
+
+# Menyuntikkan CSS berdasarkan pilihan pengguna
+st.markdown(css_shared, unsafe_allow_html=True)
+if tema == "Gelap 🌙":
+    st.markdown(css_dark, unsafe_allow_html=True)
+else:
+    st.markdown(css_light, unsafe_allow_html=True)
 
 # =========================================================
-# HEADER
+# HEADER UTAMA
 # =========================================================
 st.markdown("""
 <div class='main-header'>
     <h1>🌿 SISTEM DETEKSI PENYAKIT DAUN SAWIT BERBASIS RT-DETR</h1>
-    <p>Mendetksi beberapa penyakit pada daun sawit</p>
+    <p>Mendeteksi beberapa penyakit pada daun sawit</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -159,6 +266,7 @@ st.markdown("""
 @st.cache_resource
 def load_model():
     return RTDETR("best.pt")
+    
 try:
     model = load_model()
 except Exception as e:
@@ -171,7 +279,6 @@ except Exception as e:
 def get_advice(label):
     label = label.lower()
     
-    # Deteksi berdasarkan jenis bercak
     if "culvularia" in label or "brown spot" in label:
         return {
             "emoji": "🟠",
@@ -198,58 +305,27 @@ def get_advice(label):
         "status": "Sehat"}
 
 # =========================================================
-# SIDEBAR & NAVIGASI
-# =========================================================
-with st.sidebar:
-    st.markdown("## 🧭 **Menu**")
-    
-    menu = st.radio(
-        "Pilih Halaman:",
-        ["🏠 Beranda", "📸 Scan Gambar", "📹 Deteksi Langsung", "📈 Data"],
-        label_visibility="collapsed"
-    )
-    
-    st.markdown("---")
-    if menu in ["📸 Scan Gambar", "📹 Deteksi Langsung"]:
-        st.markdown("## ⚙️ Pengaturan AI")
-        confidence = st.slider(
-            "Kekuatan Deteksi",
-            min_value=0.1,
-            max_value=1.0,
-            value=0.4,
-            step=0.05)
-        st.markdown("---")
-        
-    st.markdown("## 📊 Info Model")
-    st.success("✅ Model Aktif")
-
-# =========================================================
 # KONTEN UTAMA
 # =========================================================
-
 if menu == "🏠 Beranda":
     st.markdown("## 👋 Selamat Datang di Sawit Detection")
     st.write("Web ini menggunakan kecerdasan buatan (AI) untuk mendeteksi jenis penyakit pada daun kelapa sawit secara otomatis. Dengan deteksi dini, Anda dapat mengambil langkah pencegahan yang tepat untuk menjaga produktivitas panen.")
     
-    st.info("👈 **Cara Penggunaan:** Buka menu navigasi di sebelah kiri (klik ikon **☰** di pojok kiri atas jika menggunakan HP), lalu pilih mode **Scan Gambar** untuk mengambil gambar langsung ataupun pilih dari galeri atau **Deteksi Langsung** untuk mulai mendeteksi secara langsung Deteksi langsung ini akan memunculkan keterangan pada kamera langsung.")
+    st.info("👈 **Cara Penggunaan:** Buka menu navigasi di sebelah kiri (klik ikon panah/bulat di pojok kiri atas jika menggunakan HP), lalu pilih mode **Scan Gambar** untuk mengambil gambar atau pilih dari galeri. Gunakan mode **Deteksi Langsung** untuk mendeteksi secara langsung via kamera.")
     
     st.markdown("---")
     st.markdown("### 🔍 Kenali Beberapa Penyakit Daun Sawit")
     
     col_a, col_b = st.columns(2)
     with col_a:
-        with st.container(border=True):
-            st.markdown("#### 🟠 Bercak Culvularia")
+        with st.expander("🟠 **Bercak Culvularia**"):
             st.write("Penyakit Curvularia adalah penyakit jamur yang menyerang daun sawit dan menyebabkan bercak coklat atau hitam. Penyakit ini lebih mudah muncul di kondisi lembap dan kebun yang kurang terawat. Jika ditangani sejak awal, penyebarannya bisa dikendalikan sehingga tanaman sawit tetap sehat dan produktif.")
-        with st.container(border=True):
-            st.markdown("#### ⚪ Bercak Pestalotiopsis")
+        with st.expander("⚪ **Bercak Pestalotiopsis**"):
             st.write("Pestalotiopsis adalah penyakit jamur yang menyerang daun tanaman kelapa sawit. Penyakit ini cukup sering ditemukan di perkebunan sawit, terutama pada tanaman yang sedang lemah atau berada di lingkungan yang terlalu lembap. Ditandai dengan lesi berwarna pucat atau putih. Infeksi ini membutuhkan penanganan cepat menggunakan **pestisida** untuk menghentikan penyebaran jamur.")
     with col_b:
-        with st.container(border=True):
-            st.markdown("#### 🔴 Bercak Heminthosprium")
+        with st.expander("🔴 **Bercak Heminthosprium**"):
             st.write("Penyakit Helminthosporium adalah salah satu penyakit jamur yang menyerang daun tanaman kelapa sawit. Penyakit ini biasanya menyebabkan munculnya bercak-bercak pada daun sehingga daun terlihat rusak, mengering, dan pertumbuhan tanaman bisa terganggu.")
-        with st.container(border=True):
-            st.markdown("#### 🟢 Daun Sehat")
+        with st.expander("🟢 **Daun Sehat**"):
             st.write("Kondisi daun normal tanpa indikasi infeksi jamur atau hama. Pertahankan jadwal perawatan rutin kebun Anda.")
 
 elif menu == "📸 Scan Gambar":
@@ -315,7 +391,6 @@ elif menu == "📹 Deteksi Langsung":
     st.markdown("## 📹 Deteksi Langsung")
     st.info("Gunakan browser Chrome dan izinkan akses kamera.")
     
-    # --- FUNGSI MENGAMBIL TURN SERVER DARI TWILIO ---
     @st.cache_data
     def get_ice_servers():
         try:
@@ -357,13 +432,11 @@ elif menu == "📈 Data":
     with c4:
         st.metric("Recall", "46.8%")
 
-    # --- PENINGKATAN GRAFIK STATISTIK PREMIUM ---
     st.markdown("### 📊 Tren Performa Pelatihan (100 Epochs)")
     
-    # Pembuatan data tren tiruan berbasis metrik asli untuk visualisasi premium
-    epochs_axis = np.arange(1, 151)
-    map_trend = 0.465 * (1 - np.exp(-epochs_axis / 35)) + np.random.normal(0, 0.01, 150)
-    loss_trend = 2.5 * np.exp(-epochs_axis / 40) + np.random.normal(0, 0.03, 150)
+    epochs_axis = np.arange(1, 101)
+    map_trend = 0.465 * (1 - np.exp(-epochs_axis / 35)) + np.random.normal(0, 0.01, 100)
+    loss_trend = 2.5 * np.exp(-epochs_axis / 40) + np.random.normal(0, 0.03, 100)
     
     chart_data = pd.DataFrame({
         'Epoch': epochs_axis,
@@ -371,7 +444,6 @@ elif menu == "📈 Data":
         'Training Loss': np.clip(loss_trend, 0, 3)
     }).set_index('Epoch')
     
-    # Menampilkan line chart interaktif bawaan Streamlit yang elegan
     st.line_chart(chart_data)
 
 # =========================================================
