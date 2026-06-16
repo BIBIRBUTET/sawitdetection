@@ -7,7 +7,6 @@ import av
 import time
 import os
 from twilio.rest import Client
-import pandas as pd
 
 # =========================================================
 # PAGE CONFIG
@@ -36,7 +35,7 @@ with st.sidebar:
     
     menu = st.radio(
         "Pilih Halaman:",
-        ["🏠 Beranda", "📸 Scan Gambar", "📹 Deteksi Langsung", "📈 Data"],
+        ["🏠 Beranda", "📸 Scan Gambar", "📹 Deteksi Langsung"],
         label_visibility="collapsed"
     )
     
@@ -133,7 +132,7 @@ div.row-widget.stRadio > div { flex-direction: column; gap: 10px; }
 </style>
 """
 
-# 2. CSS MODE GELAP (Hitam / Hijau Tua) - Tetap sama
+# 2. CSS MODE GELAP (Hitam / Hijau Tua)
 css_dark = """
 <style>
 .stApp {
@@ -419,32 +418,6 @@ elif menu == "📹 Deteksi Langsung":
         video_processor_factory=VideoProcessor,
         media_stream_constraints={"video": True, "audio": False},
         async_processing=True)
-
-elif menu == "📈 Data":
-    st.markdown("## 📈 Statistik Model")
-    c1, c2, c3, c4 = st.columns(4)
-    with c1:
-        st.metric("Epoch", "100")
-    with c2:
-        st.metric("mAP50", "46.5%")
-    with c3:
-        st.metric("Precision", "65.3%")
-    with c4:
-        st.metric("Recall", "46.8%")
-
-    st.markdown("### 📊 Tren Performa Pelatihan (100 Epochs)")
-    
-    epochs_axis = np.arange(1, 101)
-    map_trend = 0.465 * (1 - np.exp(-epochs_axis / 35)) + np.random.normal(0, 0.01, 100)
-    loss_trend = 2.5 * np.exp(-epochs_axis / 40) + np.random.normal(0, 0.03, 100)
-    
-    chart_data = pd.DataFrame({
-        'Epoch': epochs_axis,
-        'mAP50 Accuracy': np.clip(map_trend, 0, 1),
-        'Training Loss': np.clip(loss_trend, 0, 3)
-    }).set_index('Epoch')
-    
-    st.line_chart(chart_data)
 
 # =========================================================
 # FOOTER
