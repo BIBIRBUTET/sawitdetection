@@ -6,6 +6,7 @@ from streamlit_webrtc import webrtc_streamer, WebRtcMode, RTCConfiguration
 import av
 import time
 import os
+import glob
 from twilio.rest import Client
 
 # =========================================================
@@ -33,14 +34,15 @@ with st.sidebar:
     st.markdown("---")
     st.markdown("## 🧭 **Menu**")
     
+    # PERBAIKAN: Menambahkan menu Deteksi IoT ESP32
     menu = st.radio(
         "Pilih Halaman:",
-        ["🏠 Beranda", "📸 Scan Gambar", "📹 Deteksi Langsung"],
+        ["🏠 Beranda", "📸 Scan Gambar", "📹 Deteksi Langsung", "📡 Deteksi IoT ESP32"],
         label_visibility="collapsed"
     )
     
     st.markdown("---")
-    if menu in ["📸 Scan Gambar", "📹 Deteksi Langsung"]:
+    if menu in ["📸 Scan Gambar", "📹 Deteksi Langsung", "📡 Deteksi IoT ESP32"]:
         st.markdown("## ⚙️ Pengaturan AI")
         confidence = st.slider(
             "Kekuatan Deteksi",
@@ -57,7 +59,6 @@ with st.sidebar:
 # CUSTOM CSS (Struktur Dasar, Gelap, & Terang Lembut)
 # =========================================================
 
-# 1. CSS STRUKTUR BERSAMA (Ukuran, Bentuk, dan Tata Letak)
 css_shared = """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
@@ -132,7 +133,6 @@ div.row-widget.stRadio > div { flex-direction: column; gap: 10px; }
 </style>
 """
 
-# 2. CSS MODE GELAP (Hitam / Hijau Tua)
 css_dark = """
 <style>
 .stApp {
@@ -178,7 +178,6 @@ section[data-testid="stSidebar"] .stRadio p:hover {
 }
 [data-testid="collapsedControl"] svg { fill: #ffffff !important; stroke: #ffffff !important; }
 
-/* Kunci Tulisan Mode Gelap */
 .stApp p, .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp h5, .stApp h6, .stApp span, .stApp li, div[data-testid="stMetricValue"], .stApp label {
     color: #e2e8f0 !important;
 }
@@ -186,7 +185,6 @@ section[data-testid="stSidebar"] .stRadio p:hover {
 </style>
 """
 
-# 3. CSS MODE TERANG (Pastel Sage Green Lembut)
 css_light = """
 <style>
 .stApp {
@@ -232,7 +230,6 @@ section[data-testid="stSidebar"] .stRadio p:hover {
 }
 [data-testid="collapsedControl"] svg { fill: #254031 !important; stroke: #254031 !important; }
 
-/* Kunci Tulisan Mode Terang (Abu-abu Kehijauan Tua - Sangat lembut dan kontras) */
 .stApp p, .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp h5, .stApp h6, .stApp span, .stApp li, div[data-testid="stMetricValue"], .stApp label {
     color: #355242 !important;
 }
@@ -242,7 +239,6 @@ div[data-testid="stAlert"] p { color: #355242 !important; }
 </style>
 """
 
-# Menyuntikkan CSS berdasarkan pilihan pengguna
 st.markdown(css_shared, unsafe_allow_html=True)
 if tema == "Gelap 🌙":
     st.markdown(css_dark, unsafe_allow_html=True)
@@ -418,6 +414,61 @@ elif menu == "📹 Deteksi Langsung":
         video_processor_factory=VideoProcessor,
         media_stream_constraints={"video": True, "audio": False},
         async_processing=True)
+
+# PERBAIKAN: Menu baru untuk membaca gambar dari ESP32-CAM
+elif menu == "📡 Deteksi IoT ESP32":
+    st.markdown("## 📡 Deteksi Otomatis dari ESP32-CAM")
+    st.write("Halaman ini memantau dan mendeteksi gambar terbaru yang dikirimkan oleh perangkat ESP32-CAM dari kebun.")
+    
+    # Mencari gambar terbaru di folder iot_images
+    list_of_files = glob.glob('iot_images/*')
+    
+    if not list_of_files:
+        st.warning("Menunggu data... Belum ada gambar yang diterima dari ESP32-CAM.")
+        if st.button("🔄 Segarkan Halaman"):
+            st.rerun()
+    else:
+        # Mengambil file yang paling terakhir dibuat/diubah
+        latest_file = max(list_of_files, key=os.path.getctime)
+        waktu_diterima = time.ctime(os.path.getctime(latest_file))
+        
+        st.success(f"✅ Gambar terbaru diterima pada: {waktu_diterima}")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            st.image(latest_file, caption=f"Kamera ESP32: {os.path.basename(latest_file)}", use_container_width=True)
+            if st.button("🔄 Cek Gambar Baru"):
+                st.rerun()
+                
+        # Proses Prediksi
+        img = Image.open(latest_file).convert("RGB")
+        with st.spinner("⚡ Model AI sedang memindai daun dari IoT..."):
+            start_time = time.time()
+            results = model.predict(np.array(img), conf=confidence)
+            end_time = time.time()
+            
+        if results and len(results) > 0:
+            result_img = results[0].plot()[:, :, ::-1]
+            with col2:
+                st.image(result_img, caption="Hasil Deteksi AI", use_container_width=True)
+                
+            st.markdown("## 📋 Hasil Analisis & Rekomendasi")
+            boxes = results[0].boxes
+            if boxes is not None and len(boxes) > 0:
+                detected_count = len(boxes)
+                for box in boxes:
+                    cls_id = int(box.cls[0])
+                    label = model.names[cls_id]
+                    conf_score = float(box.conf[0]) * 100
+                    advice = get_advice(label)
+                    
+                    with st.container(border=True):
+                        st.subheader(f"{advice['emoji']} {advice['title']}")
+                        st.write(advice['desc'])
+                        st.progress(min(conf_score / 100, 1.0))
+                        st.caption(f"Confidence: {conf_score:.2f}% | Tindakan: {advice['status']}")
+            else:
+                st.success("✅ Tidak ditemukan penyakit. Daun sehat.")
 
 # =========================================================
 # FOOTER
